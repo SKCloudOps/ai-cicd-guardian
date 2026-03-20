@@ -279,4 +279,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-Built with ❤️ by [SKCloudOps](https://github.com/SKCloudOps)
+Built by [SKCloudOps](https://github.com/SKCloudOps)
