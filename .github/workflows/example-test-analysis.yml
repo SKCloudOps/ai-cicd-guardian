@@ -1,0 +1,48 @@
+# Example: AI Test Failure Analysis
+# Add this to .github/workflows/ai-test-analysis.yml
+
+name: CI with AI Test Analysis
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test & Analyze
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Tests
+        id: tests
+        continue-on-error: true
+        run: |
+          npm test -- --ci --reporters=default 2>&1 | tee test-output.log
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+
+      - name: AI Test Failure Analysis
+        if: steps.tests.outcome == 'failure'
+        uses: SKCloudOps/ai-cicd-guardian@v1
+        with:
+          mode: 'test-analysis'
+          ai_provider: 'github-models'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          test_log_path: 'test-output.log'
+          test_framework: 'jest'
+
+      - name: Fail if tests failed
+        if: steps.tests.outcome == 'failure'
+        run: exit 1

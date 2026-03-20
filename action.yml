@@ -1,0 +1,128 @@
+name: 'AI CI/CD Guardian'
+description: 'AI-powered CI/CD pipeline analysis - code review, release notes, test failure analysis, and deployment risk assessment'
+author: 'SKCloudOps'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  # --- Mode Selection ---
+  mode:
+    description: 'Analysis mode: pr-review | release-notes | test-analysis | deploy-risk | full'
+    required: true
+    default: 'full'
+
+  # --- AI Provider Configuration ---
+  ai_provider:
+    description: 'AI provider: github-models | openai | anthropic'
+    required: false
+    default: 'github-models'
+
+  ai_model:
+    description: 'Model name (auto-selected per provider if empty)'
+    required: false
+    default: ''
+
+  github_token:
+    description: 'GitHub token (GITHUB_TOKEN or PAT with models access)'
+    required: true
+    default: ${{ github.token }}
+
+  openai_api_key:
+    description: 'OpenAI API key (required if ai_provider is openai)'
+    required: false
+    default: ''
+
+  anthropic_api_key:
+    description: 'Anthropic API key (required if ai_provider is anthropic)'
+    required: false
+    default: ''
+
+  # --- PR Review Options ---
+  review_level:
+    description: 'Review depth: quick | standard | thorough'
+    required: false
+    default: 'standard'
+
+  post_review_comment:
+    description: 'Post review as PR comment (true/false)'
+    required: false
+    default: 'true'
+
+  # --- Release Notes Options ---
+  release_tag:
+    description: 'Tag for release notes generation (default: latest tag)'
+    required: false
+    default: ''
+
+  release_format:
+    description: 'Release notes format: markdown | json | conventional'
+    required: false
+    default: 'markdown'
+
+  # --- Test Analysis Options ---
+  test_log_path:
+    description: 'Path to test output log file'
+    required: false
+    default: ''
+
+  test_framework:
+    description: 'Test framework: auto | jest | pytest | go-test | junit | mocha'
+    required: false
+    default: 'auto'
+
+  # --- Deploy Risk Options ---
+  deploy_environment:
+    description: 'Target deployment environment: dev | staging | production'
+    required: false
+    default: 'production'
+
+  deploy_manifest_path:
+    description: 'Path to deployment manifest (k8s yaml, docker-compose, etc.)'
+    required: false
+    default: ''
+
+  # --- General Options ---
+  max_tokens:
+    description: 'Max tokens for AI response'
+    required: false
+    default: '4096'
+
+  custom_prompt:
+    description: 'Additional custom instructions for the AI analysis'
+    required: false
+    default: ''
+
+  output_file:
+    description: 'Write analysis output to this file path'
+    required: false
+    default: ''
+
+  fail_on_risk:
+    description: 'Fail the workflow if high risk is detected (deploy-risk mode)'
+    required: false
+    default: 'false'
+
+  verbose:
+    description: 'Enable verbose logging'
+    required: false
+    default: 'false'
+
+outputs:
+  analysis:
+    description: 'Full AI analysis result'
+  risk_level:
+    description: 'Risk level: low | medium | high | critical (deploy-risk mode)'
+  summary:
+    description: 'One-line summary of the analysis'
+  review_score:
+    description: 'Code quality score 1-10 (pr-review mode)'
+  release_notes:
+    description: 'Generated release notes (release-notes mode)'
+  failure_root_cause:
+    description: 'Root cause of test failure (test-analysis mode)'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

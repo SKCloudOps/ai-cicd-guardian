@@ -1,0 +1,63 @@
+# Example: Using Different AI Providers
+# Shows how to configure OpenAI and Anthropic as alternatives to GitHub Models
+
+name: AI Review (Multi-Provider)
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # Option 1: GitHub Models (free, no additional API key needed)
+  review-github-models:
+    runs-on: ubuntu-latest
+    name: Review (GitHub Models)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: SKCloudOps/ai-cicd-guardian@v1
+        with:
+          mode: 'pr-review'
+          ai_provider: 'github-models'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Option 2: OpenAI
+  review-openai:
+    runs-on: ubuntu-latest
+    name: Review (OpenAI)
+    if: false  # Enable by removing this line and adding OPENAI_API_KEY secret
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: SKCloudOps/ai-cicd-guardian@v1
+        with:
+          mode: 'pr-review'
+          ai_provider: 'openai'
+          ai_model: 'gpt-4o'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+          review_level: 'thorough'
+
+  # Option 3: Anthropic Claude
+  review-anthropic:
+    runs-on: ubuntu-latest
+    name: Review (Anthropic)
+    if: false  # Enable by removing this line and adding ANTHROPIC_API_KEY secret
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: SKCloudOps/ai-cicd-guardian@v1
+        with:
+          mode: 'pr-review'
+          ai_provider: 'anthropic'
+          ai_model: 'claude-sonnet-4-20250514'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          review_level: 'thorough'

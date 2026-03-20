@@ -1,0 +1,47 @@
+# Example: AI Deployment Risk Assessment
+# Add this to .github/workflows/ai-deploy-risk.yml
+
+name: Deploy with AI Risk Check
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  risk-assessment:
+    runs-on: ubuntu-latest
+    name: AI Deploy Risk Check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 10
+
+      - name: AI Deployment Risk Assessment
+        id: risk
+        uses: SKCloudOps/ai-cicd-guardian@v1
+        with:
+          mode: 'deploy-risk'
+          ai_provider: 'github-models'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          deploy_environment: 'production'
+          deploy_manifest_path: 'k8s/'
+          fail_on_risk: 'true'
+          output_file: 'risk-report.json'
+
+      - name: Show Risk Level
+        run: |
+          echo "Risk Level: ${{ steps.risk.outputs.risk_level }}"
+          echo "Summary: ${{ steps.risk.outputs.summary }}"
+
+  deploy:
+    needs: risk-assessment
+    runs-on: ubuntu-latest
+    name: Deploy to Production
+    steps:
+      - name: Deploy
+        run: echo "Deploying to production..."
