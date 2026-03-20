@@ -26,8 +26,8 @@ jobs:
         uses: SKCloudOps/ai-cicd-guardian@v1
         with:
           mode: 'release-notes'
-          ai_provider: 'github-models'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          ai_provider: 'anthropic'
+          ANTHROPIC_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           release_format: 'markdown'
 
       - name: Create GitHub Release
